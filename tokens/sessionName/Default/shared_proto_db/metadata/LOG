@@ -1,3 +1,2 @@
-2024/12/06-23:03:00.917 375c Reusing MANIFEST C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\shared_proto_db\metadata/MANIFEST-000001
-2024/12/06-23:03:00.917 375c Recovering log #3
-2024/12/06-23:03:00.918 375c Reusing old log C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\shared_proto_db\metadata/000003.log 
+2024/12/06-23:16:20.047 6bb0 Creating DB C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\shared_proto_db\metadata since it was missing.
+2024/12/06-23:16:20.053 6bb0 Reusing MANIFEST C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\shared_proto_db\metadata/MANIFEST-000001

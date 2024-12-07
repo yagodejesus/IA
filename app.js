@@ -1,40 +1,53 @@
 const fs = require("fs");
 const wppconnect = require("@wppconnect-team/wppconnect");
-const ExcelJS = require('exceljs');
-const getAutoShopAIResponse = require('./src/api'); // Importando a função de resposta da IA
+const ExcelJS = require("exceljs");
+const getAutoShopAIResponse = require("./src/api"); // Função de resposta da IA
 
-const EXCEL_FILE_PATH = 'dados.xlsx'; // Caminho e nome do arquivo Excel
+const EXCEL_FILE_PATH = "dados.xlsx"; // Caminho e nome do arquivo Excel
+
+// Função para limpar a sessão existente
+function clearSession() {
+  const sessionPath = "./tokens/sessionName";
+  if (fs.existsSync(sessionPath)) {
+    fs.rmSync(sessionPath, { recursive: true, force: true });
+    console.log("Sessão anterior removida com sucesso.");
+  }
+}
+
+clearSession(); // Limpa a sessão anterior ao iniciar o aplicativo
 
 wppconnect
   .create({
     session: "sessionName",
     catchQR: (base64Qr, asciiQR) => {
-      console.log(asciiQR); // Opcional para registrar o QR no terminal
-      var matches = base64Qr.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-        response = {};
-
-      if (matches.length !== 3) {
-        return new Error("Entrada de string inválida");
-      }
-      response.type = matches[1];
-      response.data = new Buffer.from(matches[2], "base64");
-
-      var imageBuffer = response;
-      fs.writeFile(
-        "out.png",
-        imageBuffer["data"],
-        "binary",
-        function (err) {
-          if (err != null) {
-            console.log(err);
-          }
-        }
-      );
+      console.log("QR Code gerado! Escaneie abaixo:");
+      console.log(asciiQR); // Exibe o QR Code no terminal em ASCII
+      const qrImage = Buffer.from(base64Qr.split(",")[1], "base64");
+      fs.writeFileSync("qrcode.png", qrImage); // Salva o QR Code como imagem
+      console.log("QR Code também salvo como 'qrcode.png'.");
     },
-    logQR: true,
+    logQR: true, // Log do QR Code no terminal
   })
   .then((client) => start(client))
-  .catch((error) => console.log(error));
+  .catch((error) => console.error("Erro ao iniciar o WPPConnect:", error));
+
+// Lógica principal do bot
+async function start(client) {
+  console.log("WhatsApp conectado com sucesso!");
+  client.onMessage(async (message) => {
+    const lowerCaseMessage = message.body.toLowerCase().trim();
+    const userId = message.from;
+
+    console.log(`Mensagem recebida de ${userId}: ${message.body}`);
+
+    if (!userStates[userId]) {
+      sendInitialMessage(client, userId);
+    } else {
+      resetTimeout(client, userId);
+      handleUserResponse(client, message, userId, lowerCaseMessage);
+    }
+  });
+}
 
 // Função para gerenciar interações com o usuário
 const userStates = {}; // Estado da conversa de cada usuário

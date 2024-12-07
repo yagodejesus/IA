@@ -1,3 +1,2 @@
-2024/12/06-23:03:00.846 3458 Reusing MANIFEST C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Sync Data\LevelDB/MANIFEST-000001
-2024/12/06-23:03:00.848 3458 Recovering log #3
-2024/12/06-23:03:00.849 3458 Reusing old log C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Sync Data\LevelDB/000003.log 
+2024/12/06-23:16:19.900 59c Creating DB C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Sync Data\LevelDB since it was missing.
+2024/12/06-23:16:19.918 59c Reusing MANIFEST C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Sync Data\LevelDB/MANIFEST-000001
