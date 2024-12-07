@@ -107,7 +107,10 @@ async function start(client) {
             case "1":
               // Pergunta 1
               client
-                .sendText(userId, "Por favor, envie a localização do impacto ambiental?📍🗺️")
+                .sendText(
+                  userId,
+                  "Por favor, envie a localização do impacto ambiental?📍🗺️"
+                )
                 .then(() => {
                   userStates[userId] = {
                     state: "waiting_for_location", // Estado atual
@@ -150,7 +153,10 @@ async function start(client) {
                   };
                 })
                 .catch((error) => {
-                  console.error("Erro ao enviar mensagem inicial da IA: ", error);
+                  console.error(
+                    "Erro ao enviar mensagem inicial da IA: ",
+                    error
+                  );
                 });
               break;
             case "3":
@@ -163,7 +169,10 @@ async function start(client) {
                   delete userStates[userId];
                 })
                 .catch((error) => {
-                  console.error("Erro ao enviar mensagem de encerramento: ", error);
+                  console.error(
+                    "Erro ao enviar mensagem de encerramento: ",
+                    error
+                  );
                 });
               break;
             default:
@@ -184,19 +193,24 @@ async function start(client) {
                   }, sessionTimeout);
                 })
                 .catch((error) => {
-                  console.error("Erro ao enviar mensagem de opção inválida: ", error);
+                  console.error(
+                    "Erro ao enviar mensagem de opção inválida: ",
+                    error
+                  );
                 });
           }
           break;
         case "waiting_for_ai_question":
           // Verificar se a mensagem é "Voltar"
           if (lowerCaseMessage === "voltar") {
-            client.sendText(
-              userId,
-              "Voltando ao menu principal. Digite uma das opções abaixo para continuar.\n\n1. Quero enviar uma imagem de impacto Ambiental 📸\n2. Quero falar com a Inteligência Artificial🧠🤖\n3. Encerrar Conversa❌"
-            ).then(() => {
-              userStates[userId].state = "waiting_for_response";
-            });
+            client
+              .sendText(
+                userId,
+                "Voltando ao menu principal. Digite uma das opções abaixo para continuar.\n\n1. Quero enviar uma imagem de impacto Ambiental 📸\n2. Quero falar com a Inteligência Artificial🧠🤖\n3. Encerrar Conversa❌"
+              )
+              .then(() => {
+                userStates[userId].state = "waiting_for_response";
+              });
           } else {
             // Enviar mensagem "Pensando..." antes de chamar a IA
             client.sendText(userId, "Pensando...🧠").then(() => {
@@ -209,16 +223,21 @@ async function start(client) {
                 })
                 .catch((error) => {
                   console.error("Erro ao obter resposta da IA: ", error);
-                  client.sendText(userId, "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.").then(() => {
-                    // Permanece no estado "waiting_for_ai_question"
-                  });
+                  client
+                    .sendText(
+                      userId,
+                      "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente."
+                    )
+                    .then(() => {
+                      // Permanece no estado "waiting_for_ai_question"
+                    });
                 });
             });
           }
           break;
         case "waiting_for_location":
           // Verifica se a mensagem recebida é uma localização
-          if (message.type === 'location') {
+          if (message.type === "location") {
             // Extrai latitude e longitude da mensagem de localização
             const latitude = message.lat;
             const longitude = message.lng;
@@ -228,7 +247,11 @@ async function start(client) {
             userStates[userId].data.longitude = longitude;
 
             // Pergunta 2
-            client.sendText(userId, "Qual é a data do impacto ambiental?(Padrão DD/MM/AAAA)📅")
+            client
+              .sendText(
+                userId,
+                "Qual é a data do impacto ambiental?(Padrão DD/MM/AAAA)📅"
+              )
               .then(() => {
                 userStates[userId].state = "waiting_for_date"; // Altera o estado para esperar a data
               })
@@ -237,17 +260,19 @@ async function start(client) {
               });
           } else {
             // Se não for uma localização válida, solicita novamente
-            client.sendText(userId, "Por favor, envie uma localização válida.📍🗺️").then(() => {
-              userStates[userId].timeout = setTimeout(() => {
-                if (userStates[userId]) {
-                  client.sendText(
-                    userId,
-                    "Sessão encerrada por inatividade🙃. Envie uma mensagem para começar novamente.😃"
-                  );
-                  delete userStates[userId];
-                }
-              }, sessionTimeout);
-            });
+            client
+              .sendText(userId, "Por favor, envie uma localização válida.📍🗺️")
+              .then(() => {
+                userStates[userId].timeout = setTimeout(() => {
+                  if (userStates[userId]) {
+                    client.sendText(
+                      userId,
+                      "Sessão encerrada por inatividade🙃. Envie uma mensagem para começar novamente.😃"
+                    );
+                    delete userStates[userId];
+                  }
+                }, sessionTimeout);
+              });
           }
           break;
         case "waiting_for_date":
@@ -270,7 +295,10 @@ async function start(client) {
 
           // Solicitar imagem
           client
-            .sendText(userId, "Por favor, envie uma imagem do impacto ambiental.📸")
+            .sendText(
+              userId,
+              "Por favor, envie uma imagem do impacto ambiental.📸"
+            )
             .then(() => {
               userStates[userId].state = "waiting_for_image"; // Altera o estado para esperar a imagem
             })
@@ -279,8 +307,10 @@ async function start(client) {
             });
           break;
         case "waiting_for_image":
-          console.log(`Estado atual: waiting_for_image. Tipo de mídia: ${message.type}`);
-          if (message.type === 'image') {
+          console.log(
+            `Estado atual: waiting_for_image. Tipo de mídia: ${message.type}`
+          );
+          if (message.type === "image") {
             try {
               const mediaData = await client.decryptFile(message); // Obter dados da mídia
               const filename = `image_${userId}_${Date.now()}.jpg`; // Gerar um nome de arquivo único
@@ -300,40 +330,62 @@ async function start(client) {
               };
               appendToExcel(EXCEL_FILE_PATH, data)
                 .then(() => {
-                  client.sendText(userId, "Dados e imagem Enviados com sucesso✅📊🖼️, Obrigado por usar o Ataide dos Dados! se quiser voltar ao menu principal, envie qualquer mensagem!").then(() => {
-                    delete userStates[userId];
-                  });
+                  client
+                    .sendText(
+                      userId,
+                      "Dados e imagem Enviados com sucesso✅📊🖼️, Obrigado por usar o Ataide dos Dados! se quiser voltar ao menu principal, envie qualquer mensagem!"
+                    )
+                    .then(() => {
+                      delete userStates[userId];
+                    });
                 })
                 .catch((error) => {
                   console.error("Erro ao adicionar dados ao Excel: ", error);
-                  client.sendText(userId, "Ocorreu um erro ao adicionar dados ao Excel. Por favor, tente novamente mais tarde.").then(() => {
-                    delete userStates[userId];
-                  });
+                  client
+                    .sendText(
+                      userId,
+                      "Ocorreu um erro ao adicionar dados ao Excel. Por favor, tente novamente mais tarde."
+                    )
+                    .then(() => {
+                      delete userStates[userId];
+                    });
                 });
             } catch (error) {
               console.error("Erro ao processar imagem: ", error);
-              client.sendText(userId, "Ocorreu um erro ao processar a imagem. Por favor, tente novamente.").then(() => {
-                delete userStates[userId];
-              });
+              client
+                .sendText(
+                  userId,
+                  "Ocorreu um erro ao processar a imagem. Por favor, tente novamente."
+                )
+                .then(() => {
+                  delete userStates[userId];
+                });
             }
           } else {
-            client.sendText(userId, "Por favor, envie uma imagem válida para adicionar aos dados do Excel.").then(() => {
-              userStates[userId].timeout = setTimeout(() => {
-                if (userStates[userId]) {
-                  client.sendText(
-                    userId,
-                    "Sessão encerrada por inatividade. Envie uma mensagem para começar novamente."
-                  );
-                  delete userStates[userId];
-                }
-              }, sessionTimeout);
-            });
+            client
+              .sendText(
+                userId,
+                "Por favor, envie uma imagem válida para adicionar aos dados do Excel."
+              )
+              .then(() => {
+                userStates[userId].timeout = setTimeout(() => {
+                  if (userStates[userId]) {
+                    client.sendText(
+                      userId,
+                      "Sessão encerrada por inatividade. Envie uma mensagem para começar novamente."
+                    );
+                    delete userStates[userId];
+                  }
+                }, sessionTimeout);
+              });
           }
           break;
         default:
-          client.sendText(userId, "Erro interno. Reinicie a conversa.").then(() => {
-            delete userStates[userId];
-          });
+          client
+            .sendText(userId, "Erro interno. Reinicie a conversa.")
+            .then(() => {
+              delete userStates[userId];
+            });
           break;
       }
     }
@@ -350,8 +402,15 @@ async function appendToExcel(filePath, data) {
       await workbook.xlsx.readFile(filePath);
       worksheet = workbook.getWorksheet(1);
     } else {
-      worksheet = workbook.addWorksheet('Dados');
-      worksheet.addRow(['UserID', 'Latitude', 'Longitude', 'Data', 'Descrição', 'Imagem']); // Cabeçalhos
+      worksheet = workbook.addWorksheet("Dados");
+      worksheet.addRow([
+        "UserID",
+        "Latitude",
+        "Longitude",
+        "Data",
+        "Descrição",
+        "Imagem",
+      ]); // Cabeçalhos
     }
 
     // Adicionar nova linha com os dados
