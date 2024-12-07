@@ -31,7 +31,7 @@ wppconnect
         }
       );
     },
-    logQR: false,
+    logQR: true,
   })
   .then((client) => start(client))
   .catch((error) => console.log(error));
