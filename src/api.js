@@ -1,50 +1,55 @@
+const axios = require("axios");
+const { loadAllDocuments, findRelevantDocs } = require("./documents");
 
-//configurações da IA
-const axios = require('axios');
+let cachedDocs = [];
 
-function getAutoShopAIResponse(userQuestion) {
-    const context = `
-    Seu nome é Ataide dos Dados
-    Especialização em Manguezais: Esta IA é especializada em responder perguntas sobre os manguezais do Pará e do mundo.
-    Idioma de Resposta: A IA responderá apenas em português (pt-BR).
-    Uso de Emojis: Utilize emojis no começo, meio e final das frases para uma interação mais amigável e envolvente.
-    Contexto e Foco: Mantenha o foco nas perguntas relacionadas aos manguezais do Pará. Perguntas fora deste contexto receberão uma resposta padrão.
-    Laguncularia racemosa
-    Mangue-branco, tinteira (Laguncularia racemosa) – É a formação vegetal mais distante do curso d´água.
+async function getAutoShopAIResponse(userQuestion) {
+  if (cachedDocs.length === 0) {
+    cachedDocs = await loadAllDocuments();
+  }
 
-    depois de cada pergunta quero que voce diga "Se quiser voltar ao menu principal basta escrever "voltar!"⏪"
+  const relevantes = findRelevantDocs(userQuestion, cachedDocs);
 
-    depois de cada pergunta quero que voce diga "Voce tem mais alguma pergunta?" com emoji no final
+  if (relevantes.length === 0) {
+    return "Não encontrei nada relacionado nos documentos.";
+  }
 
+  const contexto = relevantes
+    .map(doc => `Arquivo: ${doc.file}\n${doc.text.slice(0, 1000)}`)
+    .join("\n\n");
 
-    `;
+  const prompt = `
+Aqui vai toda a engenharai de pronpts
 
-    const client = axios.create({
-        baseURL: 'http://localhost:1234/v1',
-        headers: { 'Authorization': 'Bearer not-needed' }
-    });
+DOCUMENTOS:
+${contexto}
 
-    const data = {
-        model: "local-model",
-        messages: [
-            { "role": "system", "content": context },
-            { "role": "user", "content": userQuestion }
-        ],
-        temperature: 0.3,
-        max_tokens: 256
-    };
+PERGUNTA:
+${userQuestion}
+`;
 
-    // Retorna diretamente a Promise criada pelo Axios
-    return client.post('/chat/completions', data)
-        .then(response => {
-            // Certifique-se de retornar a mensagem inteira
-            return response.data.choices[0].message.content;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Retornar uma mensagem de erro ou tratamento padrão
-            return 'Desculpe, ocorreu um erro ao processar sua mensagem.';
-        });
+  const client = axios.create({
+    baseURL: "http://localhost:1234/v1",
+    headers: { Authorization: "Bearer not-needed" },
+  });
+
+  const data = {
+    model: "local-model",
+    messages: [
+      { role: "system", content: "Você é um assistente especialista em fisica." },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.3,
+    max_tokens: 512,
+  };
+
+  try {
+    const response = await client.post("/chat/completions", data);
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error("Erro ao consultar modelo local:", error.message);
+    return "Erro ao processar a resposta. Verifique o modelo local.";
+  }
 }
 
 module.exports = getAutoShopAIResponse;

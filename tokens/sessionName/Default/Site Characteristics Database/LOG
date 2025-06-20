@@ -1,2 +1,3 @@
-2024/12/07-00:25:15.386 5cd0 Creating DB C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Site Characteristics Database since it was missing.
-2024/12/07-00:25:15.397 5cd0 Reusing MANIFEST C:\Users\Yago\Desktop\IA Observatorio do Mangue\tokens\sessionName\Default\Site Characteristics Database/MANIFEST-000001
+2025/06/20-14:15:12.067 900 Reusing MANIFEST c:\Users\Yago\Desktop\IA\tokens\sessionName\Default\Site Characteristics Database/MANIFEST-000001
+2025/06/20-14:15:12.087 900 Recovering log #3
+2025/06/20-14:15:12.087 900 Reusing old log c:\Users\Yago\Desktop\IA\tokens\sessionName\Default\Site Characteristics Database/000003.log 
